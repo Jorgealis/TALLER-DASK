@@ -123,7 +123,7 @@ docker compose down
 `shared-data` es un bind mount a tu carpeta, así que los datos persisten
 en disco de todas formas).
 
-## Guía para las preguntas de análisis (sección 6 de la guía)
+## preguntas de análisis
 
 No son preguntas para responder "de memoria" — la idea es que generes la
 evidencia tú mismo con este mismo clúster:
@@ -157,10 +157,6 @@ evidencia tú mismo con este mismo clúster:
 
 ## Evidencia visual (capturas obtenidas)
 
-Así se insertan capturas en un README: se guarda el archivo de imagen dentro
-del proyecto (aquí en `capturas/`) y se referencia con la sintaxis
-`![texto alternativo](ruta/al/archivo.png)`. Al abrir este README en VS
-Code, GitHub, etc., las imágenes se renderizan solas.
 
 ### Dask — Task Stream (6 hilos activos: 3 workers x 2 threads)
 

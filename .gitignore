@@ -1,0 +1,25 @@
+# --- Datos generados (NO se suben) ---
+shared-data/
+*.csv
+*.parquet
+*.xlsx
+*.xls
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# --- Prefect / Dask ---
+.prefect/
+prefect.db*
+dask-worker-space/
+
+# --- Editor / SO ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

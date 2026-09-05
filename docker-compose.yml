@@ -1,0 +1,124 @@
+networks:
+  dask-cluster-net:
+    driver: bridge
+
+volumes:
+  prefect-data:
+
+x-dask-image: &dask-image
+  build: ./docker
+  image: taller-dask-cluster:local
+
+x-worker-base: &worker-base
+  <<: *dask-image
+  networks:
+    - dask-cluster-net
+  volumes:
+    - ./shared-data:/shared-data
+    # scripts/ debe estar disponible en los workers: el grafo de Dask
+    # serializa clean_partition POR REFERENCIA (cleaning_pipeline.clean_partition),
+    # asi que scheduler y workers necesitan poder importar el modulo al
+    # deserializar el grafo de tareas.
+    - ./scripts:/app/scripts
+  depends_on:
+    - dask-scheduler
+  deploy:
+    resources:
+      limits:
+        cpus: "1.0"
+        memory: 1.5G
+
+services:
+  dask-scheduler:
+    <<: *dask-image
+    hostname: dask-scheduler
+    container_name: dask-scheduler
+    command: ["dask-scheduler"]
+    ports:
+      - "8786:8786"   # IPC - comunicación con workers y cliente
+      - "8787:8787"   # Dashboard web
+    networks:
+      - dask-cluster-net
+    volumes:
+      - ./shared-data:/shared-data
+      - ./scripts:/app/scripts   # el scheduler tambien deserializa el grafo,
+                                   # asi que tambien necesita el modulo
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+
+  dask-worker-1:
+    <<: *worker-base
+    hostname: dask-worker-1
+    container_name: dask-worker-1
+    command: ["dask-worker", "tcp://dask-scheduler:8786",
+               "--nthreads", "2", "--memory-limit", "1.5GB",
+               "--name", "worker-1"]
+
+  dask-worker-2:
+    <<: *worker-base
+    hostname: dask-worker-2
+    container_name: dask-worker-2
+    command: ["dask-worker", "tcp://dask-scheduler:8786",
+               "--nthreads", "2", "--memory-limit", "1.5GB",
+               "--name", "worker-2"]
+
+  dask-worker-3:
+    <<: *worker-base
+    hostname: dask-worker-3
+    container_name: dask-worker-3
+    command: ["dask-worker", "tcp://dask-scheduler:8786",
+               "--nthreads", "2", "--memory-limit", "1.5GB",
+               "--name", "worker-3"]
+
+  # Servidor de Prefect con UI web, para poder ver y capturar los flow runs
+  # en http://localhost:4200 (en vez del servidor efimero que arranca cada
+  # corrida sin URL fija).
+  prefect-server:
+    <<: *dask-image
+    hostname: prefect-server
+    container_name: prefect-server
+    command: ["prefect", "server", "start", "--host", "0.0.0.0"]
+    ports:
+      - "4200:4200"
+    networks:
+      - dask-cluster-net
+    volumes:
+      - prefect-data:/root/.prefect
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:4200/api/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
+
+  # Contenedor "runner": aquí corres generate_dirty_data.py y el flujo de Prefect.
+  # Usa la MISMA imagen que scheduler/workers (build: ./docker) para que no
+  # haya mismatch de versiones de dask/distributed/pandas/python.
+  runner:
+    <<: *dask-image
+    hostname: dask-runner
+    environment:
+      - PREFECT_API_URL=http://prefect-server:4200/api
+    networks:
+      - dask-cluster-net
+    volumes:
+      - ./shared-data:/shared-data
+      - ./scripts:/app/scripts
+      - ./orchestration:/app/orchestration
+    depends_on:
+      dask-scheduler:
+        condition: service_started
+      dask-worker-1:
+        condition: service_started
+      dask-worker-2:
+        condition: service_started
+      dask-worker-3:
+        condition: service_started
+      prefect-server:
+        condition: service_healthy
+    stdin_open: true
+    tty: true

@@ -146,14 +146,6 @@ evidencia tú mismo con este mismo clúster:
   logs estructurados por tarea, y que el flujo falle "limpio" (quality
   gate) en vez de escribir un Parquet a medias.
 
-## Rúbrica (referencia rápida)
-
-| Criterio                          | Peso | Dónde está en este repo |
-|-----------------------------------|------|--------------------------|
-| Infraestructura Docker y Clúster  | 20%  | `docker-compose.yml` |
-| Script generador y datos sucios   | 20%  | `scripts/generate_dirty_data.py` |
-| Refactorización y limpieza Dask   | 35%  | `scripts/cleaning_pipeline.py` |
-| Orquestación Prefect y análisis   | 25%  | `orchestration/prefect_flow.py` + respuestas del informe |
 
 ## Evidencia visual (capturas obtenidas)
 

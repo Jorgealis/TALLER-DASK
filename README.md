@@ -154,3 +154,26 @@ evidencia tú mismo con este mismo clúster:
 | Script generador y datos sucios   | 20%  | `scripts/generate_dirty_data.py` |
 | Refactorización y limpieza Dask   | 35%  | `scripts/cleaning_pipeline.py` |
 | Orquestación Prefect y análisis   | 25%  | `orchestration/prefect_flow.py` + respuestas del informe |
+
+## Evidencia visual (capturas obtenidas)
+
+Así se insertan capturas en un README: se guarda el archivo de imagen dentro
+del proyecto (aquí en `capturas/`) y se referencia con la sintaxis
+`![texto alternativo](ruta/al/archivo.png)`. Al abrir este README en VS
+Code, GitHub, etc., las imágenes se renderizan solas.
+
+### Dask — Task Stream (6 hilos activos: 3 workers x 2 threads)
+
+![Dask Task Stream mostrando los 6 hilos activos en paralelo](capturas/captura_dask_task_stream.png)
+
+### Dask — tabla de Workers (nthreads, memoria, red)
+
+![Tabla de Workers de Dask con nthreads y uso de memoria](capturas/captura_dask_workers.png)
+
+### Prefect — resumen del flujo (4/4 Task Runs completadas)
+
+![Resumen del flow run en Prefect: 4 Task Runs, 100% Completed](capturas/captura_prefect_overview.png)
+
+### Prefect — timeline de las 4 tareas del flujo
+
+![Timeline de Prefect con las 4 tareas del flujo completadas](capturas/captura_prefect_timeline.png)

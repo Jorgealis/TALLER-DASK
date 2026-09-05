@@ -66,7 +66,7 @@ http://localhost:8787
 UI de Prefect (historial de flow runs, tareas y logs):
 http://localhost:4200
 
-## Capturas para la entrega
+## Entrega
 
 1. Deja el clúster arriba y corre el flujo completo:
    ```powershell
